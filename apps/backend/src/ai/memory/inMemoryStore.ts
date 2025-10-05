@@ -1,11 +1,10 @@
-// in-memory-chat.store.ts
 import { Injectable } from '@nestjs/common';
 
 export type ChatMessage = { role: 'user' | 'assistant'; content: string };
 
 @Injectable()
 export class InMemoryChatStore {
-  private history: ChatMessage[] = []; // chỉ một user
+  private history: ChatMessage[] = [];
 
   getHistory(): ChatMessage[] {
     return this.history;

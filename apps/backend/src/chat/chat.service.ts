@@ -7,9 +7,7 @@ import {
   SystemMessage,
   HumanMessage,
   AIMessage,
-  AIMessageChunk,
 } from '@langchain/core/messages';
-import { InMemoryChatStore } from '../ai/memory/inMemoryStore';
 import { chatStore } from '../ai/memory/inMemoryStore';
 import { systemLmnpPrompt } from '../ai/temlates/systemLmnpPrompt';
 
@@ -18,9 +16,6 @@ export class ChatService {
   constructor(private readonly aiService: AiService) {}
 
   async getChatHistory() {
-    // const executor = this.aiService.getExecutor();
-    // const history = await this.getMemoryHistory(executor);
-    // return history;
     return chatStore.getHistory();
   }
 
@@ -40,13 +35,23 @@ export class ChatService {
     const memory = executor.memory as BufferMemory;
 
     try {
-      const stream = await executor.stream({ input });
+      // ✅ Lấy lịch sử hội thoại trong memory
+      const { chat_history } = await memory.loadMemoryVariables({});
+      // 👇 inject lại vào input cho agent
+      const context = {
+        chat_history,
+        input,
+      };
+
+      // ✅ Bắt đầu stream
+      const stream = await executor.stream(context);
 
       let fullOutput = '';
 
       for await (const chunk of stream) {
         let data: string | undefined;
 
+        // LangChain chunk có thể chứa output ở nhiều dạng
         if (typeof chunk === 'string') {
           data = chunk;
         } else if (chunk?.output) {
@@ -55,72 +60,20 @@ export class ChatService {
 
         if (data) {
           fullOutput += data;
-          res.write(`data: ${data}\n\n`);
+          res.write(`${data}\n\n`);
+          if ((res as any).flush) {
+            (res as any).flush();
+          }
         }
       }
 
-      // ✅ Save conversation context with correct keys
-      // await memory.saveContext(
-      //   { input: new HumanMessage(content) },
-      //   { output: new AIMessage(fullOutput) },
-      // );
-      // chatStore.addMessage({ role: 'human', content: input });
-      // chatStore.addMessage({ role: 'ai', content: fullOutput });
+      // ✅ Sau khi stream xong, cập nhật memory
+      // await memory.saveContext({ input }, { output: fullOutput });
 
-      // // ✅ Debug log ngay sau khi save
-      // const hist = await memory.loadMemoryVariables({});
-      // console.log(
-      //   '>>> MEMORY DUMP',
-      //   JSON.stringify(hist.chat_history, null, 2),
-      // );
-
-      res.write(`data: [DONE]\n\n`);
+      // res.write(`data: [DONE]\n\n`);
       res.end();
     } catch (err: any) {
-      res.write(`data: [ERROR] ${err.message}\n\n`);
-      res.end();
-    }
-  }
-
-  async modelstreamAIReponse(input: string, res: Response) {
-    const model = this.aiService.getModel();
-
-    try {
-      // Lấy history từ store và map về LangChain Messages
-      const dbMessages = chatStore.getHistory();
-      const messages = dbMessages.map((m) => {
-        if (m.role === 'user') return new HumanMessage(m.content);
-        if (m.role === 'assistant') return new AIMessage(m.content);
-        if (m.role === 'system') return new SystemMessage(m.content);
-        throw new Error(`Unknown role: ${m.role}`);
-      });
-
-      // Ghép prompt + history + input mới
-      const stream = await model.stream([
-        new SystemMessage(systemLmnpPrompt),
-        ...messages,
-        new HumanMessage(input),
-      ]);
-
-      let fullOutput = '';
-
-      for await (const chunk of stream) {
-        const aiChunk = chunk as AIMessageChunk;
-        const token = aiChunk.content ?? '';
-        if (token) {
-          res.write(`data: ${token}\n\n`);
-          fullOutput += token;
-        }
-        console.log('>>> CHUNK', JSON.stringify(chunk, null, 2));
-      }
-
-      // Lưu vào store
-      chatStore.addMessage({ role: 'user', content: input });
-      chatStore.addMessage({ role: 'assistant', content: fullOutput });
-
-      res.write(`data: [DONE]\n\n`);
-      res.end();
-    } catch (err: any) {
+      console.error('❌ STREAM ERROR:', err);
       res.write(`data: [ERROR] ${err.message}\n\n`);
       res.end();
     }

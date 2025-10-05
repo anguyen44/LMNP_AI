@@ -1,8 +1,8 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { RootState } from "../store";
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { RootState } from '../store';
 
 export type Message = {
-  role: "user" | "assistant";
+  role: 'user' | 'assistant';
   content: string;
 };
 
@@ -15,7 +15,7 @@ const initialState: ChatState = {
 };
 
 const ChatSlice = createSlice({
-  name: "chat",
+  name: 'chat',
   initialState,
   reducers: {
     addMessage: (state, action: PayloadAction<Message>) => {
@@ -23,15 +23,19 @@ const ChatSlice = createSlice({
     },
     updateLastAiMessage: (state, action: PayloadAction<string>) => {
       const lastMessage = state.messages[state.messages.length - 1];
-      if (lastMessage.role === "assistant") {
+      if (lastMessage.role === 'assistant') {
         lastMessage.content += action.payload;
       }
+    },
+    setMessages: (state, action: PayloadAction<Message[]>) => {
+      state.messages = action.payload;
     },
   },
 });
 
 export const selectMessages = (state: RootState) => state.chat.messages;
 
-export const { addMessage, updateLastAiMessage } = ChatSlice.actions;
+export const { addMessage, updateLastAiMessage, setMessages } =
+  ChatSlice.actions;
 
 export default ChatSlice.reducer;

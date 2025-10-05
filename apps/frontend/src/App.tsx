@@ -1,4 +1,4 @@
-import ChatPage from "./pages/chat/Chat";
+import ChatPage from './pages/chat/Chat';
 
 function App() {
   return (

@@ -1,5 +1,3 @@
-// src/ai/memory/chat-store.memory.ts
-
 import { BaseChatMemory } from 'langchain/memory';
 import { HumanMessage, AIMessage } from '@langchain/core/messages';
 import { chatStore } from './inMemoryStore';
@@ -9,7 +7,6 @@ export class ChatStoreMemory extends BaseChatMemory {
     super();
   }
 
-  // 👇 Bắt buộc phải implement
   get memoryKeys(): string[] {
     return ['chat_history'];
   }

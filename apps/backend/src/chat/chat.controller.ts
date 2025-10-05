@@ -24,8 +24,10 @@ export class ChatController {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
+    res.setHeader('Transfer-Encoding', 'chunked');
 
     res.flushHeaders?.();
+
     return this.chatService.streamAIReponse(body.input, res);
   }
 }

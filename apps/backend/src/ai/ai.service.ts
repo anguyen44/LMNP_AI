@@ -1,17 +1,15 @@
 import { ChatGroq } from '@langchain/groq';
 import { Injectable } from '@nestjs/common';
-import { BufferMemory } from 'langchain/memory';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { systemLmnpPrompt } from './temlates/systemLmnpPrompt';
 import { AgentExecutor, createToolCallingAgent } from 'langchain/agents';
 import { SimulateLmnpTool } from './tools/simulateLmnp';
 import { ChatStoreMemory } from './memory/chat-store-memory';
-import { chatStore } from './memory/inMemoryStore';
 
 @Injectable()
 export class AiService {
   private readonly model: ChatGroq;
-  private executor: any;
+  private executor: AgentExecutor;
 
   constructor() {
     this.model = new ChatGroq({
@@ -31,13 +29,6 @@ export class AiService {
       ['placeholder', '{agent_scratchpad}'],
     ]);
 
-    // const memory = new BufferMemory({
-    //   returnMessages: true,
-    //   memoryKey: 'chat_history', // 👈 phải match với prompt
-    //   inputKey: 'input',
-    //   outputKey: 'output',
-    // });
-
     const tools = [new SimulateLmnpTool()];
 
     const agent = await createToolCallingAgent({
@@ -50,7 +41,7 @@ export class AiService {
 
     this.executor = new AgentExecutor({
       agent,
-      tools, // dùng lại biến tools
+      tools,
       memory,
       verbose: true,
     });

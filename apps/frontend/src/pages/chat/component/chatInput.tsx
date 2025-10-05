@@ -1,17 +1,17 @@
-import { useState } from "react";
-import axios from "axios";
-import { useAppDispatch } from "../../../config/store/store";
+import { useState } from 'react';
+import axios from 'axios';
+import { useAppDispatch } from '../../../config/store/store';
 import {
   addMessage,
   updateLastAiMessage,
   type Message,
-} from "../../../config/store/slices/chatSlices";
+} from '../../../config/store/slices/chatSlices';
 
 type AIResponse = { response: string };
 
 export const ChatInput = () => {
   const dispatch = useAppDispatch();
-  const [pendingMessage, setPendingMessage] = useState("");
+  const [pendingMessage, setPendingMessage] = useState('');
 
   const handleChangeMessage = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPendingMessage(e.target.value);
@@ -21,14 +21,14 @@ export const ChatInput = () => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
-    const content = formData.get("chat") as string;
+    const content = formData.get('chat') as string;
     if (content) {
-      const userMessage: Message = { role: "user", content };
+      const userMessage: Message = { role: 'user', content };
       dispatch(addMessage(userMessage));
-      setPendingMessage("");
+      setPendingMessage('');
       const res = await getAiResponse({ input: content });
       const aiMessage: Message = {
-        role: "assistant",
+        role: 'assistant',
         content: res.data.response,
       };
       dispatch(addMessage(aiMessage));
@@ -36,17 +36,17 @@ export const ChatInput = () => {
   };
 
   const handleSendMesWithStream = async (
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
-    const content = formData.get("chat") as string;
+    const content = formData.get('chat') as string;
     if (content) {
-      const userMessage: Message = { role: "user", content };
+      const userMessage: Message = { role: 'user', content };
       dispatch(addMessage(userMessage));
-      setPendingMessage("");
-      dispatch(addMessage({ role: "assistant", content: "" }));
+      setPendingMessage('');
+      dispatch(addMessage({ role: 'assistant', content: '' }));
       await callApiStrem(content, (chunkData: string) => {
         dispatch(updateLastAiMessage(chunkData));
       });
@@ -54,56 +54,38 @@ export const ChatInput = () => {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       e.preventDefault();
       e.currentTarget.form?.requestSubmit();
     }
   };
 
   const getAiResponse = async (body: { input: string }) => {
-    return axios.post<AIResponse>("http://localhost:3000/chat", body);
+    return axios.post<AIResponse>('http://localhost:3000/chat', body);
   };
 
   const callApiStrem = async (
     input: string,
-    onChunk: (data: string) => void
+    onChunk: (data: string) => void,
   ) => {
-    const response = await fetch("http://localhost:3000/chat/stream", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const response = await fetch('http://localhost:3000/chat/stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ input }),
     });
 
-    const reader: ReadableStreamDefaultReader<Uint8Array> | undefined =
-      response.body?.getReader();
+    if (!response.body) throw new Error('No response body');
 
-    if (!reader) throw new Error("No response body");
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
 
-    const decoder = new TextDecoder("utf-8");
     while (true) {
       const { value, done } = await reader.read();
       if (done) break;
-      let chunk = decoder.decode(value, { stream: true });
 
-      // 🔎 Tách theo từng event SSE
-      chunk.split("\n\n").forEach((line) => {
-        if (line.startsWith("data:")) {
-          const data = line.replace("data:", "").trim();
-          if (!data || data === "[DONE]") return;
-          onChunk(data);
-
-          // // Typing effect từng ký tự
-          // let i = 0;
-          // const interval = setInterval(() => {
-          //   if (i < data.length) {
-          //     onChunk(data[i]); // emit từng ký tự
-          //     i++;
-          //   } else {
-          //     clearInterval(interval);
-          //   }
-          // }, 10);
-        }
-      });
+      buffer += decoder.decode(value, { stream: true });
+      onChunk(buffer);
     }
   };
 
