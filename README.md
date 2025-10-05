@@ -47,7 +47,7 @@ nx --version
 ## 📥 2. Clone the repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/anguyen44/LMNP_AI.git
 cd LMNP_AI-main
 ```
 
@@ -84,9 +84,7 @@ cp .env.example .env
 Then open `.env` and configure your variables, for example:
 
 ```
-DATABASE_URL=postgresql://user:password@localhost:5432/dbname
-PORT=3000
-JWT_SECRET=your_secret_here
+GROQ_API_KEY=your_groq_api_key
 ```
 
 ---
