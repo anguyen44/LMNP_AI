@@ -48,7 +48,7 @@ nx --version
 
 ```bash
 git clone https://github.com/anguyen44/LMNP_AI.git
-cd LMNP_AI-main
+cd LMNP_AI
 ```
 
 ---
@@ -89,9 +89,18 @@ GROQ_API_KEY=your_groq_api_key
 
 ---
 
-## ▶️ 5. Run the project in development mode
+## ⚡ 5. Run frontend and backend together in development mode
+
+To run both apps concurrently with Nx:
+
+```bash
+nx run-many --target=serve --all
+```
+
+## ▶️ 6. Run the each service in development mode
 
 You can use **Nx** or run apps directly.
+From the root directory, run:
 
 ### Run backend only
 
@@ -104,3 +113,8 @@ nx serve backend
 ```bash
 nx serve frontend
 ```
+
+## 💡 7. Access points
+
+- **Frontend:** [http://localhost:5173](http://localhost:5173)
+- **Backend API:** [http://localhost:3000](http://localhost:3000)
