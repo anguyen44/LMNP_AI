@@ -1,76 +1,108 @@
-# MyMonorepo
+# 🚀 LMNP AI Monorepo
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+This project is an **Nx monorepo** that includes both a **NestJS backend** and a **Vite-based frontend**.  
+It provides an integrated environment for developing, building, and running full-stack applications easily.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+---
 
-Run `npx nx graph` to visually explore what got created. Now, let's get you up to speed!
+## 🧠 Overview
 
-## Finish your CI setup
+**Structure:**
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/Ssn4ZcewmS)
-
-
-## Run tasks
-
-To run tasks with Nx use:
-
-```sh
-npx nx <target> <project-name>
+```
+LMNP_AI-main/
+├── apps/
+│   ├── backend/     # NestJS API server
+│   └── frontend/    # Frontend app (Vite + React)
+├── nx.json          # Nx configuration
+├── package.json     # Root dependencies and scripts
+├── tsconfig.base.json
+└── Makefile         # Optional helper for automation
 ```
 
-For example:
+---
 
-```sh
-npx nx build myproject
+## ⚙️ 1. Prerequisites
+
+Make sure you have installed:
+
+- **Node.js** ≥ 18
+- **npm** (comes with Node.js) or **pnpm**
+- (Optional) **Nx CLI** for better developer experience
+
+```bash
+npm install -g nx
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+Check your versions:
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Add new projects
-
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-To install a new plugin you can use the `nx add` command. Here's an example of adding the React plugin:
-```sh
-npx nx add @nx/react
+```bash
+node -v
+npm -v
+nx --version
 ```
 
-Use the plugin's generator to create new projects. For example, to create a new React app or library:
+---
 
-```sh
-# Generate an app
-npx nx g @nx/react:app demo
+## 📥 2. Clone the repository
 
-# Generate a library
-npx nx g @nx/react:lib some-lib
+```bash
+git clone <your-repo-url>
+cd LMNP_AI-main
 ```
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+---
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## 📦 3. Install dependencies
 
+From the root directory, run:
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```bash
+npm install
+```
 
-## Install Nx Console
+> This installs all dependencies for both frontend and backend automatically using Nx.
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+---
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## 🧩 4. Setup environment variables
 
-## Useful links
+### Backend
 
-Learn more:
+Go to the backend directory:
 
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```bash
+cd apps/backend
+```
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Copy the example environment file:
+
+```bash
+cp .env.example .env
+```
+
+Then open `.env` and configure your variables, for example:
+
+```
+DATABASE_URL=postgresql://user:password@localhost:5432/dbname
+PORT=3000
+JWT_SECRET=your_secret_here
+```
+
+---
+
+## ▶️ 5. Run the project in development mode
+
+You can use **Nx** or run apps directly.
+
+### Run backend only
+
+```bash
+nx serve backend
+```
+
+### Run frontend only
+
+```bash
+nx serve frontend
+```
